@@ -23,11 +23,6 @@
 
 
 
-    <script type="text/javascript" src="https://bootswatch.com/bower_components/jquery/dist/jquery.min.js"></script>
-
-
-
-    <script type="text/javascript" src="https://bootswatch.com/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
 
 
@@ -7063,6 +7058,30 @@
 
 <body>
 <h1>Just Conference</h1>
+<div class ="jumbotron">
+
+    <P class="text-warning"> Instruction
+    <P  class="text-success">    : Creating a room -> 1 Choose a Room ID and UserID(must be unique) and Click "Create a Room"
+    </P>
+    <p class="text-primary">
+    2.To join a room -> fill the roomid , which u want to join and choose a unique nick
+        click the Start Camera button
+        Click the Join ROOM BUTTON
+        you must follow the order of clicking
+    </p>
+
+    </div>
+
+<div><h4>ROOMS ACTIVE NOW</h4>HCEL
+
+    <ul class="list-group" id="activerooms">
+        <li class="list-group-item">
+            <span class="badge">No of USERS</span>
+            <div class="text-info">ROOM NAME</div>
+        </li>
+
+    </ul>
+</div>
 <div>
     <div class="form-group">
         <label class="control-label" for="roomid">New Room Id</label>
@@ -7137,8 +7156,29 @@ function registrationBtnClick(){
     socket.send(JSON.stringify(packet));
 
 };
-function joiningNow(){
-    startCameraFeed();
+function joiningNow(){var c=0;
+    {
+
+
+        var params={audio:true,video:{ width: 480, height: 320 }};
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        navigator.getUserMedia(params, function (s) {
+            document.getElementById("Myvideo").src = window.URL.createObjectURL(s);
+            document.getElementById("Myvideo").muted=true;
+            console.log("VideoFeed Started");
+            stream = s;
+            console.log("Stream is added to global "+stream);
+            console.log(stream);
+
+        }, function (e) {
+            console.log("Error in aceesing camera", e);
+        });
+
+
+
+
+
+        ;c++;}
     var joinrequest={rid:roomid.value,username:userid.value,action:"joining"};
     console.log("Joining the Room");
     var t=JSON.stringify(joinrequest);
@@ -7176,13 +7216,15 @@ socket.onmessage=function(data1){
         sessiondetails.room=1;
         sessiondetails.username=1;
         sessiondetails.join=1;
-        //
-        // media.style.display="inline";
+        document.getElementById("loginstatus").className = "label label-success";
+        console.log(document.getElementById("loginstatus").class);
+        document.getElementById("loginstatus").innerHTML = "Room Successfully Created Ask Your Friends to Join";
+        document.getElementById("userid").disabled=true;
 
 
         roomid.disabled=true;
     }else if(data.execution===-1) {
-        document.getElementById("loginstatus").className = "label label-warning";
+        document.getElementById("loginstatus").className = "label label-danger";
         console.log(document.getElementById("loginstatus").class);
         document.getElementById("loginstatus").innerHTML = "room already exists please choose other name";
         sessiondetails.room = 0;
@@ -7199,7 +7241,10 @@ socket.onmessage=function(data1){
         if(data.userstate===0 && data.roomidstate===0){
             document.getElementById("loginstatus").className = "label label-success";
             document.getElementById("loginstatus").innerHTML = "You have Successfuly Joined Room and you username is "+userid.value;
-                sessiondetails.join=1;
+            document.getElementById("roomid").disabled=true;
+            document.getElementById("userid").disabled=true;
+
+            sessiondetails.join=1;
             sessiondetails.room=1;
             sessiondetails.username=1;
            // media.style.display="inline";
@@ -7282,6 +7327,17 @@ socket.onmessage=function(data1){
 
         rtcsending[data.rootuser]=new RTCPeerConnection(servers);
         rtcsending[data.rootuser].addStream(stream);
+        rtcsending[data.rootuser].onicecandidate=function(event){
+            alert("New Edit");
+            if(event.candidate){console.log(data.remoteuser+"is sending ICE candidate for  "+data.rootuser);
+                var ices={action:"ice",rid:roomid.value,ice:event.candidate,origin:userid.value,destination:data.rootuser};
+                // console.log("Sending ICE "+JSON.stringify(ices));
+                socket.send(JSON.stringify(ices));
+
+
+            }
+        };
+
         rtcsending[data.rootuser].onaddstream=function(event){//alert("Got the stream");
             var x=document.createElement("VIDEO");
             x.setAttribute("src",window.URL.createObjectURL(event.stream));
@@ -7313,11 +7369,14 @@ socket.onmessage=function(data1){
     if(data.action==="answer"){
         var t=data.from;
         if(data.to!=data.from){
-        //alert("completeing rtc sessions");
-
+       alert("completeing rtc sessions");
+         console.log(rtcsending);alert();
         rtcsending[t].setRemoteDescription(data.descrip);
-            rtcsending[t].onicecandidate=function(event){if(event.candidate){//alert("I ahve ice candidate too");
-}};
+            rtcsending[t].onicecandidate=function(event){
+                if(event.candidate){
+                    alert(data.to+"I ahve ice candidate too u shold send it to "+data.from);
+}
+            };
         console.log("RTC is set in new user by name of "+t);
         console.log("****______****");
         console.log(rtcsending);}
@@ -7338,7 +7397,22 @@ socket.onmessage=function(data1){
             console.log("ICE should be set for "+t);
         console.log("XXXXXXXXOOOOOOXXXXXXOOOOOOOXXXXXXXOOOOOOOXXXXXXX");
     }
+    if(data.action==="listofactive"){
+       var rm=data.roomnames;
+        var nm=data.noofusers;
+        while(rm.length!=0) { //console.log("ROom - "+rm.pop()+" has "+nm.pop());
+        var ls=document.getElementById("activerooms");
+            var r=document.createElement("li");
+           r.className="list-group-item";
+            r.appendChild(document.createTextNode((rm.pop())));
+            var sp=document.createElement("span");
+            sp.className="badge";var kk=nm.pop();alert(kk);
+            sp.appendChild(document.createTextNode(kk));
+            r.appendChild(sp);
+            ls.appendChild(r);
+        }
 
+    }
 
 
 
