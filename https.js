@@ -26,7 +26,7 @@
         res.write(site.toString());
         res.end();
     });
-    a.listen(1310, "192.168.118.25");
+    a.listen(1310, "192.168.0.4");
     var wss = new WebSocket({server: a});
     var users={};
    // var userset1={aditya:"connection",vikram:"connection2"};
@@ -91,6 +91,18 @@ if(data.action==="answer"){
 if(data.action==="ice"){
     console.log("Relaying the ICE candidate from "+data.origin+" to "+data.destination);
     rooms[data.rid][data.destination].send(JSON.stringify(data));
+}
+if (data.action==="listofactive"){
+    var get={action:"listofactive",roomnames:[],noofusers:[]};
+    for(var r in rooms)
+    {if(Object.keys(rooms[r]).length>0) {
+        get.roomnames.push(r);
+        get.noofusers.push(Object.keys(rooms[r]).length);
+        console.log("Room name "+r);
+    }
+    }
+    var replas={action:"listofactive",roomsa:get};
+    link.send(JSON.stringify(get));
 }
 
 

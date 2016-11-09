@@ -7072,7 +7072,7 @@
 
     </div>
 
-<div><h4>ROOMS ACTIVE NOW</h4>HCEL
+<div><h4 class="text-warning">ROOMS ACTIVE NOW</h4>
 
     <ul class="list-group" id="activerooms">
         <li class="list-group-item">
@@ -7114,7 +7114,7 @@
 <script>
 
     /* variable declaration*/
-    var socket=new WebSocket("wss://192.168.118.25:1310");//lan:.....>>>>>"wss://192.168.118.26:1010
+    var socket=new WebSocket("wss://192.168.0.4:1310");//lan:.....>>>>>"wss://192.168.118.26:1010
     var  roomid=document.getElementById("roomid");
     var userid=document.getElementById("userid");
     var userlist;
@@ -7400,13 +7400,16 @@ socket.onmessage=function(data1){
     if(data.action==="listofactive"){
        var rm=data.roomnames;
         var nm=data.noofusers;
+        document.getElementById("activerooms").innerHTML="";
+
         while(rm.length!=0) { //console.log("ROom - "+rm.pop()+" has "+nm.pop());
         var ls=document.getElementById("activerooms");
+
             var r=document.createElement("li");
            r.className="list-group-item";
             r.appendChild(document.createTextNode((rm.pop())));
             var sp=document.createElement("span");
-            sp.className="badge";var kk=nm.pop();alert(kk);
+            sp.className="badge";var kk=nm.pop();
             sp.appendChild(document.createTextNode(kk));
             r.appendChild(sp);
             ls.appendChild(r);
@@ -7418,7 +7421,9 @@ socket.onmessage=function(data1){
 
 };
 
-
+    setInterval(function(){
+        socket.send(JSON.stringify({action:"listofactive"}));
+    },3000);
 
 
 
