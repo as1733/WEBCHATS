@@ -7101,9 +7101,9 @@
         </div>
 
     </div>
-    <video id="Myvideo" poster="images.jpg" width="320" height="240" autoplay>
+ <div id="sss"> <video id="Myvideo" poster="images.jpg" width="320" height="240" autoplay>
 </video>
-</video>
+</div>
     <p></p>
     <a href="#" class="btn btn-primary">Primary</a>
     <a href="#" class="btn btn-success">Success</a>
@@ -7114,7 +7114,7 @@
 <script>
 
     /* variable declaration*/
-    var socket=new WebSocket("wss://192.168.0.4:1310");//lan:.....>>>>>"wss://192.168.118.26:1010
+    var socket=new WebSocket("wss://192.168.118.26:1310");//lan:.....>>>>>"wss://192.168.118.26:1010
     var  roomid=document.getElementById("roomid");
     var userid=document.getElementById("userid");
     var userlist;
@@ -7297,7 +7297,8 @@ socket.onmessage=function(data1){
                         x.setAttribute("height","240");
                         x.setAttribute("id",user);
                         x.setAttribute("autoplay",true);
-                        document.body.appendChild(x);
+                        document.getElementById("sss").appendChild(x);
+                      //  document.body.appendChild(x);
                     };
             }
             });
@@ -7328,7 +7329,7 @@ socket.onmessage=function(data1){
         rtcsending[data.rootuser]=new RTCPeerConnection(servers);
         rtcsending[data.rootuser].addStream(stream);
         rtcsending[data.rootuser].onicecandidate=function(event){
-            alert("New Edit");
+          //  alert("New Edit");
             if(event.candidate){console.log(data.remoteuser+"is sending ICE candidate for  "+data.rootuser);
                 var ices={action:"ice",rid:roomid.value,ice:event.candidate,origin:userid.value,destination:data.rootuser};
                 // console.log("Sending ICE "+JSON.stringify(ices));
@@ -7369,12 +7370,12 @@ socket.onmessage=function(data1){
     if(data.action==="answer"){
         var t=data.from;
         if(data.to!=data.from){
-       alert("completeing rtc sessions");
-         console.log(rtcsending);alert();
+      // alert("completeing rtc sessions");
+         console.log(rtcsending);//alert();
         rtcsending[t].setRemoteDescription(data.descrip);
             rtcsending[t].onicecandidate=function(event){
                 if(event.candidate){
-                    alert(data.to+"I ahve ice candidate too u shold send it to "+data.from);
+                  //  alert(data.to+"I ahve ice candidate too u shold send it to "+data.from);
 }
             };
         console.log("RTC is set in new user by name of "+t);
